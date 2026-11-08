@@ -95,11 +95,14 @@ If the page is not found (404), check the *Application context* in the Deploymen
 
 ## 8. Screenshots
 
-Add the screenshots here:
+Home page:
+<img width="479" height="379" alt="photo_2026-11-08_08-21-05" src="https://github.com/user-attachments/assets/73272ef3-43f2-4600-81bf-8f73c332daaf" />
 
-- `screenshots/home.png` - the calculator page
-- `screenshots/result.png` - a calculated result
-- `screenshots/error.png` - divide by zero error
+<img width="404" height="375" alt="photo_2026-11-08_08-21-47" src="https://github.com/user-attachments/assets/f58f58d5-c81c-460d-8a8b-904edfaaae5a" />
+
+<img width="389" height="364" alt="photo_2026-11-08_08-22-08" src="https://github.com/user-attachments/assets/0505af1d-b214-4c4b-ae0f-a93dc5f8e6d8" />
+
+
 
 ## 9. Problems I Faced
 
