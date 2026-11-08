@@ -6,7 +6,7 @@ The user enters two numbers, selects an operator and the result is shown on the 
 **Name:** Shayla Akter
 **ID:** IT24022
 **Department:** Information and Communication Technology (ICT), MBSTU
-**Session:** 2023-24 (2nd Year 2nd Semester)
+**Session:** 2023-24 (3rd Year 1st Semester)
 
 ---
 
