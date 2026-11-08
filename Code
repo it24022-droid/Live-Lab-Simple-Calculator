@@ -1,0 +1,101 @@
+package com.example.calculator;
+
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+
+// Tomcat 10+ uses the jakarta.* packages (Tomcat 9 or older would use javax.*)
+@WebServlet("/calculator")
+public class CalculatorServlet extends HttpServlet {
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        render(resp, "", "", "+", null, null);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        String a = req.getParameter("num1");
+        String b = req.getParameter("num2");
+        String op = req.getParameter("op");
+        if (a == null) a = "";
+        if (b == null) b = "";
+        if (op == null) op = "+";
+
+        String result = null;
+        String error = null;
+        try {
+            double x = Double.parseDouble(a.trim());
+            double y = Double.parseDouble(b.trim());
+            double r;
+            switch (op) {
+                case "+": r = x + y; break;
+                case "-": r = x - y; break;
+                case "*": r = x * y; break;
+                case "/":
+                    if (y == 0) throw new ArithmeticException("Cannot divide by zero.");
+                    r = x / y;
+                    break;
+                case "%":
+                    if (y == 0) throw new ArithmeticException("Cannot take modulus by zero.");
+                    r = x % y;
+                    break;
+                default:
+                    throw new ArithmeticException("Unknown operator.");
+            }
+            result = format(r);
+        } catch (NumberFormatException e) {
+            error = "Please enter two valid numbers.";
+        } catch (ArithmeticException e) {
+            error = e.getMessage();
+        }
+        render(resp, a, b, op, result, error);
+    }
+
+    private static String format(double r) {
+        if (r == Math.rint(r) && Math.abs(r) < 1e15) return String.valueOf((long) r);
+        return String.valueOf(r);
+    }
+
+    private static String esc(String s) {
+        return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;");
+    }
+
+    private static String opt(String value, String label, String selected) {
+        return "<option value=\"" + value + "\"" + (value.equals(selected) ? " selected" : "") + ">" + label + "</option>";
+    }
+
+    private void render(HttpServletResponse resp, String a, String b, String op,
+                        String result, String error) throws IOException {
+        resp.setContentType("text/html;charset=UTF-8");
+        PrintWriter out = resp.getWriter();
+        out.println("<!DOCTYPE html><html><head><meta charset=\"UTF-8\"><title>Servlet Calculator</title>");
+        out.println("<style>");
+        out.println("body{font-family:Arial,sans-serif;background:#eef2f7;display:flex;justify-content:center;padding-top:60px}");
+        out.println(".card{background:#fff;padding:28px 34px;border-radius:12px;box-shadow:0 4px 14px rgba(0,0,0,.15);width:320px}");
+        out.println("h2{margin-top:0;text-align:center}");
+        out.println("input,select,button{width:100%;padding:10px;margin:6px 0;font-size:16px;box-sizing:border-box}");
+        out.println("button{background:#2563eb;color:#fff;border:none;border-radius:6px;cursor:pointer}");
+        out.println(".res{margin-top:14px;padding:12px;background:#e8f7ec;border-radius:6px;font-size:20px;text-align:center}");
+        out.println(".err{margin-top:14px;padding:12px;background:#fdecea;color:#b71c1c;border-radius:6px;text-align:center}");
+        out.println("</style></head><body><div class=\"card\"><h2>Simple Calculator</h2>");
+        out.println("<form method=\"post\" action=\"calculator\">");
+        out.println("<input type=\"text\" name=\"num1\" placeholder=\"First number\" value=\"" + esc(a) + "\">");
+        out.println("<select name=\"op\">"
+                + opt("+", "+ &nbsp;Add", op)
+                + opt("-", "- &nbsp;Subtract", op)
+                + opt("*", "&times; &nbsp;Multiply", op)
+                + opt("/", "&divide; &nbsp;Divide", op)
+                + opt("%", "% &nbsp;Modulus", op)
+                + "</select>");
+        out.println("<input type=\"text\" name=\"num2\" placeholder=\"Second number\" value=\"" + esc(b) + "\">");
+        out.println("<button type=\"submit\">Calculate</button></form>");
+        if (result != null) out.println("<div class=\"res\">Result: <b>" + esc(result) + "</b></div>");
+        if (error != null) out.println("<div class=\"err\">" + esc(error) + "</div>");
+        out.println("</div></body></html>");
+    }
+}
